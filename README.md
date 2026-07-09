@@ -6,7 +6,7 @@ You can preview the live generator here: **[nandiraju.github.io/dividers](https:
 
 ---
 
-## 🚀 Quick Start Guide
+## <img src="https://unpkg.com/ionicons@7.1.0/dist/svg/rocket.svg" width="20" height="20" align="middle" /> Quick Start Guide
 
 Transforming a straight section split into an elegant shape split takes only four steps:
 
@@ -35,7 +35,7 @@ Paste the copied CSS into your stylesheet and add the class name to your section
 
 ---
 
-## 🎨 Tuning Your Dividers
+## <img src="https://unpkg.com/ionicons@7.1.0/dist/svg/color-palette.svg" width="20" height="20" align="middle" /> Tuning Your Dividers
 
 To create the perfect look, you can adjust the following parameters:
 
@@ -56,7 +56,7 @@ Turn on the **Responsive** toggle to generate screen-size optimized media querie
 
 ---
 
-## ⚠️ Important Implementation Tip
+## <img src="https://unpkg.com/ionicons@7.1.0/dist/svg/warning.svg" width="20" height="20" align="middle" /> Important Implementation Tip
 
 The generated base CSS applies `position: relative` to your section class (e.g., `.svg_divider`) because the divider is rendered as an absolutely positioned `::before` pseudo-element. 
 
@@ -64,7 +64,7 @@ If your target element is already using `position: absolute` or `position: fixed
 
 ---
 
-## 📁 Workspace Directory Map
+## <img src="https://unpkg.com/ionicons@7.1.0/dist/svg/folder.svg" width="20" height="20" align="middle" /> Workspace Directory Map
 
 Here is what you will find in this project directory:
 
