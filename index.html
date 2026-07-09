@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shape Dividers — SVG section divider generator</title>
+
+<script>
+  /* set the theme before first paint so there is no flash of the wrong one */
+  (function () {
+    var saved = null;
+    try { saved = localStorage.getItem('sd-theme'); } catch (e) {}
+    var sys = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+    document.documentElement.dataset.theme = saved || sys;
+  })();
+</script>
+
+<style>
+/* ============================ theme tokens ============================ */
+:root[data-theme="dark"]{
+  --bg:#0e1117; --panel:#161b26; --panel2:#0f131c; --line:#2a3244;
+  --text:#e6e9f0; --muted:#8b95ad; --accent:#4f7cff; --accent2:#22d3ee;
+  --on-accent:#fff; --sel:#1d2c57;
+  --canvas:#fff; --checker-a:#151a24; --checker-b:#11151d;
+  --shadow:0 10px 40px rgba(0,0,0,.5);
+  --code:#c9d4ee;
+}
+:root[data-theme="light"]{
+  --bg:#f6f7fa; --panel:#fff; --panel2:#f0f2f6; --line:#dbe0ea;
+  --text:#1a1f2b; --muted:#5d6779; --accent:#3363f0; --accent2:#0d8fa6;
+  --on-accent:#fff; --sel:#e3ebff;
+  --canvas:#fff; --checker-a:#e7eaf0; --checker-b:#dfe3ea;
+  --shadow:0 10px 30px rgba(18,28,54,.14);
+  --code:#2b3550;
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:14px/1.5 ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  -webkit-font-smoothing:antialiased}
+html,body{transition:background-color .2s ease,color .2s ease}
+h1{font-size:20px;margin:0}
+h2{font-size:15px;margin:0 0 10px}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.92em}
+button,select,input{font:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:12px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+header .sub{color:var(--muted);font-size:12.5px}
+header .actions{display:flex;gap:8px;align-items:center}
+
+.app{display:grid;grid-template-columns:340px minmax(0,1fr);min-height:calc(100vh - 58px)}
+@media(max-width:900px){.app{grid-template-columns:1fr}}
+
+/* ============================ sidebar ============================ */
+aside{border-right:1px solid var(--line);padding:14px;overflow:auto;max-height:calc(100vh - 58px)}
+@media(max-width:900px){aside{max-height:none;border-right:0;border-bottom:1px solid var(--line)}}
+
+.grp{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:12px}
+.f{margin-bottom:12px}.f:last-child{margin-bottom:0}
+label.lb{display:flex;justify-content:space-between;align-items:baseline;gap:8px;
+  font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+label.lb b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums;text-transform:none;letter-spacing:0}
+input[type=range]{width:100%;accent-color:var(--accent)}
+select{width:100%;background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:7px;padding:7px 9px}
+input[type=color]{width:100%;height:34px;padding:2px;background:var(--panel2);
+  border:1px solid var(--line);border-radius:7px;cursor:pointer}
+
+.seg{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.seg.three{grid-template-columns:repeat(3,1fr)}
+.seg button{background:var(--panel2);border:1px solid var(--line);color:var(--muted);
+  border-radius:7px;padding:7px 4px;cursor:pointer;font-size:12.5px;transition:background .12s,color .12s,border-color .12s}
+.seg button:hover{color:var(--text)}
+.seg button[aria-pressed=true]{background:var(--sel);border-color:var(--accent);color:var(--text)}
+
+.chk{display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;font-size:13px;color:var(--text)}
+.chk input{accent-color:var(--accent);width:16px;height:16px;margin:0}
+.hint{color:var(--muted);font-size:11.5px;margin:6px 0 0}
+.hidden{display:none !important}
+
+.btn{background:var(--accent);color:var(--on-accent);border:0;border-radius:7px;
+  padding:8px 13px;cursor:pointer;font-weight:600}
+.btn.ghost{background:var(--panel2);border:1px solid var(--line);color:var(--text);font-weight:500}
+.btn.icon{padding:8px 10px;line-height:1;font-size:15px}
+
+/* ============================ preview ============================ */
+main{display:flex;flex-direction:column;min-width:0}
+.bar{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.bar .spacer{flex:1}
+
+#responsive_view_framer{flex:1;display:flex;align-items:center;justify-content:center;padding:20px;
+  background:repeating-conic-gradient(var(--checker-a) 0 25%, var(--checker-b) 0 50%) 0 0/22px 22px;
+  overflow:auto;transition:all .3s}
+
+#previewer{display:flex;flex-direction:column-reverse;background:var(--canvas);
+  transition:all .3s;box-shadow:var(--shadow)}
+#previewer > div{flex-grow:1}
+#previewer.top{flex-direction:column-reverse}
+#previewer.bottom{flex-direction:column}
+#previewer.right{flex-direction:row}
+#previewer.left{flex-direction:row-reverse}
+
+/* stands in for the section that carries the divider */
+#previewer .image_div{
+  background-image:linear-gradient(135deg,#1f6feb 0%,#8957e5 50%,#db61a2 100%);
+  background-size:cover;background-position:center}
+/* the neighbouring section — its colour is what the divider fills with */
+#previewer .color_div{background-color:#f3f3f3;transition:background-color .12s}
+
+.auto #previewer{width:100%;height:100%;min-height:460px}
+.tablet-portrait #previewer{width:768px;height:1024px;max-height:100%;flex:none}
+.mobile-portrait #previewer{width:414px;height:736px;max-height:100%;flex:none}
+
+/* the primitive this tool generates */
+.svg_divider{overflow:hidden;position:relative}
+
+/* ============================ code ============================ */
+.codewrap{border-top:1px solid var(--line);background:var(--panel2)}
+.codehead{display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--line)}
+.tab{background:transparent;border:1px solid transparent;color:var(--muted);
+  border-radius:6px;padding:5px 10px;cursor:pointer;font-size:12.5px}
+.tab:hover{color:var(--text)}
+.tab[aria-selected=true]{color:var(--text);border-color:var(--accent);background:var(--sel)}
+pre{margin:0;padding:12px 14px;overflow:auto;max-height:260px;font-size:12px;line-height:1.5;
+  color:var(--code);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre}
+
+/* ============================ gallery ============================ */
+dialog#gal{border:1px solid var(--line);background:var(--panel);color:var(--text);
+  border-radius:12px;padding:0;width:min(940px,92vw);max-height:82vh}
+dialog#gal::backdrop{background:rgba(0,0,0,.6)}
+.galhead{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;
+  border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel);z-index:1}
+.galgrid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));padding:14px;overflow:auto}
+.card{background:var(--panel2);border:1px solid var(--line);border-radius:8px;cursor:pointer;
+  padding:0;overflow:hidden;color:inherit;text-align:left}
+.card:hover{border-color:var(--accent)}
+.card[aria-pressed=true]{border-color:var(--accent2)}
+.card .th{height:64px;background-color:var(--sel);background-repeat:no-repeat;
+  background-position:50% 0;background-size:100% 40px}
+.card .nm{padding:7px 9px;font-size:11.5px;color:var(--muted);border-top:1px solid var(--line);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,150%);background:var(--sel);
+  border:1px solid var(--accent);color:var(--text);padding:9px 16px;border-radius:999px;
+  transition:transform .25s;z-index:99}
+.toast.show{transform:translate(-50%,0)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Shape Dividers</h1>
+    <div class="sub">SVG divider generator — 4 edges, 3 breakpoints, animation. Emits pure CSS, no markup change.</div>
+  </div>
+  <div class="actions">
+    <button class="btn ghost icon" id="theme" title="Toggle light / dark" aria-label="Toggle colour theme"></button>
+    <button class="btn ghost" id="openGal">Browse 50 shapes</button>
+    <button class="btn" id="copy">Copy CSS</button>
+  </div>
+</header>
+
+<div class="app">
+  <!-- ============================ controls ============================ -->
+  <aside>
+    <div class="grp">
+      <h2>Shape</h2>
+      <div class="f"><select id="shape" aria-label="Divider shape"></select></div>
+      <label class="chk"><input type="checkbox" id="responsive"><span>Responsive (per-breakpoint settings)</span></label>
+      <p class="hint">Off → one CSS block. On → mobile base + <code>768px</code> + <code>1025px</code> tiers.</p>
+    </div>
+
+    <div class="grp">
+      <h2 style="display:flex;justify-content:space-between;align-items:center">
+        <span>Settings</span>
+        <span id="tierName" style="font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em"></span>
+      </h2>
+
+      <div class="f hidden" id="tierPick">
+        <label class="lb">Editing breakpoint</label>
+        <div class="seg three" id="tierSeg">
+          <button type="button" data-tier="mobile">Mobile</button>
+          <button type="button" data-tier="tablet">Tablet</button>
+          <button type="button" data-tier="desktop" aria-pressed="true">Desktop</button>
+        </div>
+      </div>
+
+      <div class="f">
+        <label class="lb">Direction</label>
+        <div class="seg" id="dirSeg">
+          <button type="button" data-dir="top" aria-pressed="true">Top</button>
+          <button type="button" data-dir="right">Right</button>
+          <button type="button" data-dir="bottom">Bottom</button>
+          <button type="button" data-dir="left">Left</button>
+        </div>
+      </div>
+
+      <div class="f">
+        <label class="lb" for="color">Color</label>
+        <input type="color" id="color" value="#f3f3f3">
+      </div>
+
+      <div class="f" id="wrapLong">
+        <label class="lb" for="long_axis">Long axis <b><span id="vLong">100</span>%</b></label>
+        <input type="range" id="long_axis" min="100" max="400" value="100">
+      </div>
+
+      <div class="f">
+        <label class="lb" for="short_axis">Short axis <b><span id="vShort">90</span>px</b></label>
+        <input type="range" id="short_axis" min="0" max="400" value="90">
+      </div>
+
+      <div class="f hidden" id="wrapPos">
+        <label class="lb" for="position">Position <b><span id="vPos">50</span>%</b></label>
+        <input type="range" id="position" min="0" max="100" value="50">
+        <p class="hint">Only bites once the long axis exceeds 170% — the shape must overflow to have somewhere to slide.</p>
+      </div>
+
+      <div class="f" id="wrapFlip">
+        <label class="chk"><input type="checkbox" id="flipped"><span>Flip</span></label>
+      </div>
+
+      <div class="f">
+        <label class="chk"><input type="checkbox" id="animate"><span>Animate</span></label>
+        <p class="hint">Locks long axis to 100% and ping-pongs a scaled shape across the edge.</p>
+      </div>
+
+      <div class="f hidden" id="wrapAnimLen">
+        <label class="lb" for="animation_length">Duration <b><span id="vAnimLen">10</span>s</b></label>
+        <input type="range" id="animation_length" min="4" max="200" value="10">
+      </div>
+
+      <div class="f hidden" id="wrapAnimLong">
+        <label class="lb" for="animation_long_axis">Animation long axis <b><span id="vAnimLong">4</span>×</b></label>
+        <input type="range" id="animation_long_axis" min="1" max="10" step="0.1" value="4">
+      </div>
+    </div>
+  </aside>
+
+  <!-- ============================ preview ============================ -->
+  <main>
+    <div class="bar">
+      <span style="color:var(--muted);font-size:12px">Preview</span>
+      <div class="seg three" id="viewSeg" style="width:260px">
+        <button type="button" data-view="auto" aria-pressed="true">Auto</button>
+        <button type="button" data-view="tablet-portrait">Tablet</button>
+        <button type="button" data-view="mobile-portrait">Mobile</button>
+      </div>
+      <div class="spacer"></div>
+      <span class="hint" id="tierEcho" style="margin:0"></span>
+    </div>
+
+    <div id="responsive_view_framer" class="auto">
+      <div id="previewer" class="top">
+        <div class="image_div svg_divider" id="pv"></div>
+        <div class="color_div" id="neighbour"></div>
+      </div>
+    </div>
+
+    <div class="codewrap">
+      <div class="codehead">
+        <button class="tab" data-tab="css" aria-selected="true">CSS</button>
+        <button class="tab" data-tab="html" aria-selected="false">HTML</button>
+        <div class="spacer" style="flex:1"></div>
+        <span class="hint" style="margin:0">Paste the CSS, add <code>class="svg_divider"</code> to your section.</span>
+      </div>
+      <pre id="out"></pre>
+    </div>
+  </main>
+</div>
+
+<dialog id="gal">
+  <div class="galhead"><strong>Shape library</strong><button class="btn ghost" id="closeGal">Close</button></div>
+  <div class="galgrid" id="galgrid"></div>
+</dialog>
+
+<div class="toast" id="toast" role="status" aria-live="polite">Copied</div>
+
+<script>
+/* =====================================================================
+   SHAPE LIBRARY — top-oriented sources: viewBox "0 0 W H", solid mass
+   along y=0. The other three edges are derived from these at runtime.
+   ===================================================================== */
+const SHAPES={
+"arc":["0 0 1000 100",`<path d="M0 0v100S0 4 500 4s500 96 500 96V0H0Z"/>`],
+"arch":["0 0 1000 100",`<path d="M0 0v4s250 96 500 96 500-96 500-96V0H0Z"/>`],
+"book":["0 0 1200 120",`<path d="M1200,0H0V120H281.94C572.9,116.24,602.45,3.86,602.45,3.86h0S632,116.24,923,120h277Z"/>`],
+"bubble":["0 0 1000 100",`<path d="M0 0v4c250 0 250 96 500 96S750 4 1000 4V0H0Z"/>`],
+"bubble-side":["0 0 1000 100",`<path d="M1000 0H0v52C62.5 28 125 4 250 4c250 0 250 96 500 96 125 0 187.5-24 250-48V0Z"/>`],
+"clouds":["0 0 283.5 27.8",`<path d="M0 0v6.7c1.9-.8 4.7-1.4 8.5-1 9.5 1.1 11.1 6 11.1 6s2.1-.7 4.3-.2c2.1.5 2.8 2.6 2.8 2.6s.2-.5 1.4-.7c1.2-.2 1.7.2 1.7.2s0-2.1 1.9-2.8c1.9-.7 3.6.7 3.6.7s.7-2.9 3.1-4.1 4.7 0 4.7 0 1.2-.5 2.4 0 1.7 1.4 1.7 1.4h1.4c.7 0 1.2.7 1.2.7s.8-1.8 4-2.2c3.5-.4 5.3 2.4 6.2 4.4.4-.4 1-.7 1.8-.9 2.8-.7 4 .7 4 .7s1.7-5 11.1-6c9.5-1.1 12.3 3.9 12.3 3.9s1.2-4.8 5.7-5.7c4.5-.9 6.8 1.8 6.8 1.8s.6-.6 1.5-.9c.9-.2 1.9-.2 1.9-.2s5.2-6.4 12.6-3.3c7.3 3.1 4.7 9 4.7 9s1.9-.9 4 0 2.8 2.4 2.8 2.4 1.9-1.2 4.5-1.2 4.3 1.2 4.3 1.2.2-1 1.4-1.7 2.1-.7 2.1-.7-.5-3.1 2.1-5.5 5.7-1.4 5.7-1.4 1.5-2.3 4.2-1.1c2.7 1.2 1.7 5.2 1.7 5.2s.3-.1 1.3.5c.5.4.8.8.9 1.1.5-1.4 2.4-5.8 8.4-4 7.1 2.1 3.5 8.9 3.5 8.9s.8-.4 2 0 1.1 1.1 1.1 1.1 1.1-1.1 2.3-1.1 2.1.5 2.1.5 1.9-3.6 6.2-1.2 1.9 6.4 1.9 6.4 2.6-2.4 7.4 0c3.4 1.7 3.9 4.9 3.9 4.9s3.3-6.9 10.4-7.9 11.5 2.6 11.5 2.6.8 0 1.2.2c.4.2.9.9.9.9s4.4-3.1 8.3.2c1.9 1.7 1.5 5 1.5 5s.3-1.1 1.6-1.4c1.3-.3 2.3.2 2.3.2s-.1-1.2.5-1.9 1.9-.9 1.9-.9-4.7-9.3 4.4-13.4c5.6-2.5 9.2.9 9.2.9s5-6.2 15.9-6.2 16.1 8.1 16.1 8.1.7-.2 1.6-.4V0H0z"/>`],
+"curve":["0 0 1000 100",`<path d="M1000 100C500 100 500 4 0 4V0h1000v100Z"/>`],
+"curves":["0 0 240 24",`<path fill-opacity=".33" d="M240,24V0H0v24C0,24,47.861,5.107,119.849,5.107C191.855,5.107,240,24,240,24z"/><path fill-opacity=".33" d="M119.829,2.661c55.562,0,98.521,9.957,120.171,16.271V0H0v18.902C21.582,12.598,64.37,2.65,119.829,2.661z"/><path d="M119.81,0.117c50.737,0,92.456,6.89,120.19,13.271V0H0v13.34C27.651,6.979,69.17,0.117,119.81,0.117z"/>`],
+"diagonal":["0 0 1000 100",`<path d="M0,6V0h1000v100L0,6z"/>`],
+"double-bubble":["0 0 1000 100",`<path d="M500 4c-125 0-125 96-250 96S125 4 0 4V0h1000v4c-125 0-125 96-250 96S625 4 500 4Z"/>`],
+"frame-4":["0 0 1000 100",`<path d="M0 0v4c136 143.8 183.8-73.2 297 26.6 72.2 63.7 97 99 184.7 33.2a30.5 30.5 0 0 1 36.6 0c87.6 65.8 112.5 30.5 184.7-33.2C816.2-69.2 864 147.7 1000 4V0H0Z"/>`],
+"grunge-3":["0 0 1000 100",`<path d="M0 0v47.6l5-2c1 0 11 3 12 0 2 3 6-3 6 0 0-4 12 3 12 0 0 3 15-1 17 0 2-2 5-1 6 0 0-2 6 2 6 0s2 4 4 0c5 2 12-3 16 0 2-2 4-3 4 0 0 2 6-1 6 0 1 4 15-2 17 0h7c0 1 3-3 6 0h17c2 2 3 1 6 0h6c1-2 21-1 24 0 2 1 4 2 6 0 0-1 22 4 24 0 0 0 5-3 5 0 2-2 10 2 12 0 2 2 6 1 6 0 2 3 4-2 6 0 1 0 25-2 25 1l10-1c3 1 6 6 7 0 1 5 4-2 6 0 2-2 4 3 5 0h12c6 1 36 2 36 0 0 2 3 0 6 0h6c5-2 7 4 11 0 2 0 15 2 17 0h13c3-4 5 1 7 0h29c0-3 6 0 6 0h5c0 2 16-1 18 0 1 4 9-1 12 0s6-2 6 0c8-2 3 4 13 0h10c3 4 19 1 19 0 2 0 21 1 23-1 1 4 3-1 6 1 1 2 11-1 12-1 3 3 9 0 12 1 3-4 6 1 6 0h6c0-3 5 1 6-1 0 3 2 1 4 1 3 4 10-1 13 0 3-2 6-1 6 0 2 2 2 0 6 0 1-2 6 2 6 0 2 0 4 5 6 0h18c2 3 4 1 6 0l6-1c3 2 12 3 17 1 14 3 18 1 24 0 2-1 3 3 5 0 6 2 10-1 16 0 1 3 6 0 9 0 0-2 3 2 5 0 6-6 8 7 13 0 0-2 5 2 5 0 3 3 10 0 10 0 1 2 5-2 8 0 3-1 8 3 12 0h6c2 1 10 4 12 0h6c1-1 5 2 6 0 1 2 4-1 6 0 0-2 5 3 6-1 2 1 6 5 5 1 1 1 3-2 6 0 2-1 5 3 6 0 0 1 6 2 6 0 2 3 4-4 6 0 0-2 3 2 6 0 3 0 6 3 6 0 5 3 8-1 13 0 3-4 6 1 6 0h5c0-1 9 2 12 0 1-1 9 3 11 0h6c2 2 4 4 7 0 3 2 5-4 5-1 10 4 15-2 18 2 0-1 6 2 6-2 0 0 6-2 6 1 1 6 12 2 12 0 1 3 4-3 7 2 2-2 5 2 5 0 1 5 4-5 6 0 2-1 4 2 6 0 1 3 1 0 5 0V0H0Z"/>`],
+"hills":["0 0 240 24",`<path fill-opacity=".33" d="M240,24V0c-69.5,0-73.2,14.8-98,17.8c-24.7,3-49.9-4.3-69.8-4.2C53,13.8,50.3,18,30.2,20.9C15.6,23.5,4.3,19.6,0,19v5H240z"/><path fill-opacity=".33" d="M240,24V3c-51.8,0-73.2,11.8-98,14.8c-24.7,3-49.9-2.3-69.8-2.2C53,15.8,50.3,18,30.2,20.9C15.6,23.5,4.3,22.6,0,22v2H240z"/><path d="M240,24V5c-51.8,0-73.2,10.8-98,13.8c-24.7,3-49.9-1.3-69.8-1.2C53,17.8,50.3,19,30.2,21.9C15.6,24.5,4.3,23.6,0,23v1H240z"/>`],
+"intersecting-curves":["0 0 1000 100",`<path d="M0 0v100c250 0 375-24 500-48 125 24 250 48 500 48V0H0Z" opacity=".5"/><path d="M0 0v4c250 0 375 24 500 48C625 28 750 4 1000 4V0H0Z"/>`],
+"intersecting-tilt-angles":["0 0 1000 100",`<path d="M0 0v100l500-48 500 48V0H0z" opacity=".5"/><path d="M0 0h1000v52H0z" opacity=".5"/><path d="M0 0v4l500 48 500-48V0H0z" opacity=".5"/><path d="M0 0v4l500 48 500-48V0H0z"/>`],
+"intersecting-wave-layers":["0 0 1000 100",`<path d="M0 0v100c166.7 0 166.7-66 333.3-66S500 77 666.7 77 833.3 28 1000 28V0H0Z" opacity=".5"/><path d="M0 0v100c166.7 0 166.7-66 333.3-66S500 70 666.7 70 833.3 16 1000 16V0H0Z" opacity=".5"/><path d="M0 0v100c166.7 0 166.7-66 333.3-66S500 63 666.7 63 833.3 4 1000 4V0H0Z"/>`],
+"intersecting-waves-scattered":["0 0 1000 100",`<path d="M0 1v99c134.3 0 153.7-99 296-99H0Z" opacity=".5"/><path d="M1000 4v86C833.3 90 833.3 3.6 666.7 3.6S500 90 333.3 90 166.7 4 0 4h1000Z" opacity=".5"/><path d="M617 1v86C372 119 384 1 196 1h421Z" opacity=".5"/><path d="M1000 0H0v52C62.5 28 125 4 250 4c250 0 250 96 500 96 125 0 187.5-24 250-48V0Z"/>`],
+"intersecting-waves-split":["0 0 1000 100",`<path d="M0 0v99.7C62 69 122.4 48.7 205 66c83.8 17.6 160.5 20.4 240-12 54-22 110-26 173-10a392.2 392.2 0 0 0 222-5c55-17 110.3-36.9 160-27.2V0H0Z" opacity=".5"/><path d="M0 0v74.7C62 44 122.4 28.7 205 46c83.8 17.6 160.5 25.4 240-7 54-22 110-21 173-5 76.5 19.4 146.5 23.3 222 0 55-17 110.3-31.9 160-22.2V0H0Z"/>`],
+"layered-arch":["0 0 1000 100",`<path d="M0 0h1000v4H0z"/><path d="M0 0h1000v80.8S550 100 500 100 0 80.8 0 80.8V0Z" opacity=".2"/><path d="M0 0h1000v61.6S600 100 500 100 0 61.6 0 61.6V0Z" opacity=".3"/><path d="M0 0h1000v42.4S650 100 500 100 0 42.4 0 42.4V0Z" opacity=".4"/><path d="M0 0h1000v23.2S700 100 500 100 0 23.2 0 23.2V0Z" opacity=".5"/><path d="M0 0v4s250 96 500 96 500-96 500-96V0H0Z"/>`],
+"layered-curves":["0 0 1000 100",`<path d="M500 80.7C358 68 0 4 0 4V0h1000v84.7c-216 23.3-358 8.6-500-4Z" opacity=".3"/><path d="M500 65.7C358 53 0 4 0 4V0h1000v62.7c-216 23.3-358 15.6-500 3Z" opacity=".5"/><path d="M500 50.7C358 38 0 4 0 4V0h1000v40.7C784 64 642 63.3 500 50.7Z"/>`],
+"layered-slants":["0 0 1000 100",`<path d="M0 100V0h1000v4L0 100z"/><path d="M0 100V0h1000v24L0 100z" opacity=".5"/><path d="M0 100V0h1000v44L0 100z" opacity=".4"/><path d="M0 100V0h1000v64L0 100z" opacity=".4"/><path d="M0 100V0h1000v84L0 100z" opacity=".2"/>`],
+"layered-triangle":["0 0 1000 100",`<path d="M0 0v84l500 16 500-16V0H0z" opacity=".2"/><path d="M0 0v64l500 36 500-36V0H0z" opacity=".4"/><path d="M0 0v44l500 56 500-56V0H0z" opacity=".4"/><path d="M0 0v24l500 76 500-76V0H0z" opacity=".5"/><path d="M0 0v4l500 96 500-96V0H0z"/>`],
+"layered-wave":["0 0 1000 100",`<path d="M1000 100C500 100 500 64 0 64V0h1000v100Z" opacity=".5"/><path d="M1000 100C500 100 500 34 0 34V0h1000v100Z" opacity=".5"/><path d="M1000 100C500 100 500 4 0 4V0h1000v100Z"/>`],
+"mountain":["0 0 1000 100",`<path d="m0 4 150 40h160l190 50 190-50h160l150-40V0H0v4z"/>`],
+"mountains":["0 0 1000 100",`<path opacity=".33" d="M473,67.3c-203.9,88.3-263.1-34-320.3,0C66,119.1,0,59.7,0,59.7V0h1000v59.7c0,0-62.1,26.1-94.9,29.3c-32.8,3.3-62.8-12.3-75.8-22.1C806,49.6,745.3,8.7,694.9,4.7S492.4,59,473,67.3z"/><path opacity=".66" d="M734,67.3c-45.5,0-77.2-23.2-129.1-39.1c-28.6-8.7-150.3-10.1-254,39.1s-91.7-34.4-149.2,0C115.7,118.3,0,39.8,0,39.8V0h1000v36.5c0,0-28.2-18.5-92.1-18.5C810.2,18.1,775.7,67.3,734,67.3z"/><path d="M766.1,28.9c-200-57.5-266,65.5-395.1,19.5C242,1.8,242,5.4,184.8,20.6C128,35.8,132.3,44.9,89.9,52.5C28.6,63.7,0,0,0,0h1000c0,0-9.9,40.9-83.6,48.1S829.6,47,766.1,28.9z"/>`],
+"oval-halves":["0 0 1000 100",`<path d="M0 0v4c0 53 112 96 250 96S500 57 500 4c0 53 112 96 250 96s250-43 250-96V0H0Z"/>`],
+"oval-halves-inverse":["0 0 1000 100",`<path d="M0 0v100C0 47 112 4 250 4s250 43 250 96c0-53 112-96 250-96s250 43 250 96V0H0Z"/>`],
+"pyramid":["0 0 1000 100",`<path d="M0 0v4l250 64 125-32 250 64 375-96V0H0z"/>`],
+"rays":["0 0 2600 130.1",`<path d="M0 0L2600 0 2600 69.1 0 0z"/><path opacity=".5" d="M0 0L2600 0 2600 69.1 0 69.1z"/><path opacity=".25" d="M2600 0L0 0 0 130.1 2600 69.1z"/>`],
+"slope-asymmetrical":["0 0 1000 100",`<path d="M0 0v100-79.4a1892 1892 0 0 1 500 0l500 66.7V0H0Z"/>`],
+"slope-subtle":["0 0 1000 100",`<path d="M0 0v100S500 4 1000 4V0H0Z"/>`],
+"spikes-medium":["0 0 1000 100",`<path d="M0 0h1000v4H0zM10 100 0 4h20l-10 96zM30 100 20 4h20l-10 96zM50 100 40 4h20l-10 96zM70 100 60 4h20l-10 96zM90 100 80 4h20l-10 96zM110 100 100 4h20l-10 96zM130 100 120 4h20l-10 96zM150 100 140 4h20l-10 96zM170 100 160 4h20l-10 96zM190 100 180 4h20l-10 96zM210 100 200 4h20l-10 96zM230 100 220 4h20l-10 96zM250 100 240 4h20l-10 96zM270 100 260 4h20l-10 96zM290 100 280 4h20l-10 96zM310 100 300 4h20l-10 96zM330 100 320 4h20l-10 96zM350 100 340 4h20l-10 96zM370 100 360 4h20l-10 96zM390 100 380 4h20l-10 96zM410 100 400 4h20l-10 96zM430 100 420 4h20l-10 96zM450 100 440 4h20l-10 96zM470 100 460 4h20l-10 96zM490 100 480 4h20l-10 96zM510 100 500 4h20l-10 96zM530 100 520 4h20l-10 96zM550 100 540 4h20l-10 96zM570 100 560 4h20l-10 96zM590 100 580 4h20l-10 96zM610 100 600 4h20l-10 96zM630 100 620 4h20l-10 96zM650 100 640 4h20l-10 96zM670 100 660 4h20l-10 96zM690 100 680 4h20l-10 96zM710 100 700 4h20l-10 96zM730 100 720 4h20l-10 96zM750 100 740 4h20l-10 96zM770 100 760 4h20l-10 96zM790 100 780 4h20l-10 96zM810 100 800 4h20l-10 96zM830 100 820 4h20l-10 96zM850 100 840 4h20l-10 96zM870 100 860 4h20l-10 96zM890 100 880 4h20l-10 96zM910 100 900 4h20l-10 96zM930 100 920 4h20l-10 96zM950 100 940 4h20l-10 96zM970 100 960 4h20l-10 96zM990 100 980 4h20l-10 96z"/>`],
+"steps-round":["0 0 1000 100",`<path d="M0 0v80l227.5 18c12.1 1 22.5-8.6 22.5-20.7s10.4-21.8 22.5-20.8l205 16.3c12.1 1 22.5-8.6 22.5-20.8s10.4-21.7 22.5-20.8l205 16.3c12.1 1 22.5-8.6 22.5-20.8S760.4 5 772.5 6L1000 24V0H0Z"/>`],
+"stripes-large":["0 0 1000 100",`<path d="M0 0h10v100H0zM20 0h10v100H20zM40 0h10v100H40zM60 0h10v100H60zM80 0h10v100H80zM100 0h10v100h-10zM120 0h10v100h-10zM140 0h10v100h-10zM160 0h10v100h-10zM180 0h10v100h-10zM200 0h10v100h-10zM220 0h10v100h-10zM240 0h10v100h-10zM260 0h10v100h-10zM280 0h10v100h-10zM300 0h10v100h-10zM320 0h10v100h-10zM340 0h10v100h-10zM360 0h10v100h-10zM380 0h10v100h-10zM400 0h10v100h-10zM420 0h10v100h-10zM440 0h10v100h-10zM460 0h10v100h-10zM480 0h10v100h-10zM500 0h10v100h-10zM520 0h10v100h-10zM540 0h10v100h-10zM560 0h10v100h-10zM580 0h10v100h-10zM600 0h10v100h-10zM620 0h10v100h-10zM640 0h10v100h-10zM660 0h10v100h-10zM680 0h10v100h-10zM700 0h10v100h-10zM720 0h10v100h-10zM740 0h10v100h-10zM760 0h10v100h-10zM780 0h10v100h-10zM800 0h10v100h-10zM820 0h10v100h-10zM840 0h10v100h-10zM860 0h10v100h-10zM880 0h10v100h-10zM900 0h10v100h-10zM920 0h10v100h-10zM940 0h10v100h-10zM960 0h10v100h-10zM980 0h10v100h-10z"/>`],
+"triangle":["0 0 1000 100",`<path d="M500,98.9L0,6.1V0h1000v6.1L500,98.9z"/>`],
+"triangle-asymmetric":["0 0 1000 100",`<path d="M738,99l262-93V0H0v5.6L738,99z"/>`],
+"triangle-curve-inverse":["0 0 1000 100",`<path d="M0 0v100c500 0 475-96 500-96s0 96 500 96V0H0Z"/>`],
+"triangle-round-asymmetrical":["0 0 1000 100",`<path d="M0 0v4l594.5 84a1118.6 1118.6 0 0 0 311 0l94.5-13.3V0H0Z"/>`],
+"triangle-rounded":["0 0 1000 100",`<path d="M0 0v4l396.3 84a500.1 500.1 0 0 0 207.4 0L1000 4V0H0Z"/>`],
+"triangle-slope-inverse":["0 0 1000 100",`<path d="M0 0v100c250 0 500-96 500-96s250 96 500 96V0H0Z"/>`],
+"valley":["0 0 1000 100",`<path d="m0 4 86.6 23.1c42.1 11.2 85.5 16.9 129 16.9h29.7c73 0 129.8 17.1 127.3 16.5 83.5 22 171.3 22 254.8 0 123.2-32.4 162.9-.6 286-33.4L1000 4V0H0v4Z"/>`],
+"wave":["0 0 1000 100",`<path d="M421.9,6.5c22.6-2.5,51.5,0.4,75.5,5.3c23.6,4.9,70.9,23.5,100.5,35.7c75.8,32.2,133.7,44.5,192.6,49.7c23.6,2.1,48.7,3.5,103.4-2.5c54.7-6,106.2-25.6,106.2-25.6V0H0v30.3c0,0,72,32.6,158.4,30.5c39.2-0.7,92.8-6.7,134-22.4c21.2-8.1,52.2-18.2,79.7-24.2C399.3,7.9,411.6,7.5,421.9,6.5z"/>`],
+"wave-shallow":["0 0 1920 60",`<path d="M-153.5,85.5a4002.033,4002.033,0,0,1,658-71c262.854-6.5,431.675,15.372,600,27,257.356,17.779,624.828,19.31,1089-58v102Z"/>`],
+"waves":["0 0 283.5 27.8",`<path d="M283.5,9.7c0,0-7.3,4.3-14,4.6c-6.8,0.3-12.6,0-20.9-1.5c-11.3-2-33.1-10.1-44.7-5.7s-12.1,4.6-18,7.4c-6.6,3.2-20,9.6-36.6,9.3C131.6,23.5,99.5,7.2,86.3,8c-1.4,0.1-6.6,0.8-10.5,2c-3.8,1.2-9.4,3.8-17,4.7c-3.2,0.4-8.3,1.1-14.2,0.9c-1.5-0.1-6.3-0.4-12-1.6c-5.7-1.2-11-3.1-15.8-3.7C6.5,9.2,0,10.8,0,10.8V0h283.5V9.7z"/><path d="M269.6,18c-0.1-0.1-4.6,0.3-7.2,0c-7.3-0.7-17-3.2-16.6-2.9c0.4,0.3,13.7,3.1,17,3.3C267.7,18.8,269.7,18,269.6,18z"/><path d="M227.4,9.8c-0.2-0.1-4.5-1-9.5-1.2c-5-0.2-12.7,0.6-12.3,0.5c0.3-0.1,5.9-1.8,13.3-1.2S227.6,9.9,227.4,9.8z"/><path d="M201,10.6c0-0.1-4.4,1.2-6.3,2.2c-1.9,0.9-6.2,3.1-6.1,3.1c0.1,0.1,4.2-1.6,6.3-2.6S201,10.7,201,10.6z"/><path d="M154.5,26.7c-0.1-0.1-4.6,0.3-7.2,0c-7.3-0.7-17-3.2-16.6-2.9c0.4,0.3,13.7,3.1,17,3.3C152.6,27.5,154.6,26.8,154.5,26.7z"/><path d="M41.9,19.3c0,0,1.2-0.3,2.9-0.1c1.7,0.2,5.8,0.9,8.2,0.7c4.2-0.4,7.4-2.7,7-2.6c-0.4,0-4.3,2.2-8.6,1.9c-1.8-0.1-5.1-0.5-6.7-0.4S41.9,19.3,41.9,19.3z"/><path d="M15.6,13.2c0-0.1,4.3,0,6.7,0.5c2.4,0.5,5,1.9,5,2c0,0.1-2.7-0.8-5.1-1.4C19.9,13.7,15.7,13.3,15.6,13.2z"/>`],
+"waves-2-large":["0 0 1000 100",`<path d="M0 0v60c9 0 18-3 25-10 13-14 36-14 50 0s36 14 50 0c13-14 36-14 50 0s36 14 50 0c13-14 36-14 50 0s36 14 50 0c13-14 36-14 50 0s36 14 50 0c13-14 36-14 50 0s36 14 50 0c13-14 36-14 50 0s36 14 50 0c13-14 36-14 50 0s36 14 50 0c13-14 36-14 50 0s36 14 50 0c13-14 36-14 50 0s37 13 50 0c14-14 37-14 50 0 7 7 16 10 25 10V0H0Z"/>`],
+"waves-simple":["0 0 1000 100",`<path d="M0 0v41s40 117.6 337 20.7c46.7-15.2 104.8-46 163-46 58.1 0 116.3 30.8 163 46 297 97 337-20.7 337-20.7V0H0Z"/>`],
+"waves-water-inverse":["0 0 1000 100",`<path d="M0 0v92.3C106.3 35 276 23.6 343.6 73.7 458.2 18.3 637 8.5 693 57.3 779.6 18.6 915.7-2.4 1000 16.1V0H0Z"/>`],
+"wavy-mantle":["0 0 1000 100",`<path d="M0 0v4c154 96 190 17.9 300 17.9 92 0 92 78.1 200 78.1s108-78.2 200-78.2c110 0 146 78.2 300-17.8V0H0Z"/>`],
+"wavy-steps":["0 0 1000 100",`<path d="M0 0v90.2C49.7 99.9 105 82 160 65c75.5-23.3 145.5-22.4 222-3 63 16 119 14 173-8 79.5-32.4 156.2-27.6 240-10 82.6 17.4 143-1 205-31.7V0H0Z"/>`],
+"zigzag":["0 0 1000 100",`<path d="M761.9,44.1L643.1,27.2L333.8,98L0,3.8V0l1000,0v3.9z"/>`],
+};
+const NAMES = Object.keys(SHAPES).sort();
+
+const DIRS = ['top','right','bottom','left'];
+const HOR  = d => d === 'top' || d === 'bottom';
+
+/* geometry per edge: how the source is transformed, and whether W/H swap.
+   The anchored edge (y=0 in the source) must land on the target edge.
+     bottom : (x,y) -> (x,   H-y)
+     right  : (x,y) -> (H-y, x  )   viewBox swaps to "0 0 H W"
+     left   : (x,y) -> (y,   W-x)   viewBox swaps to "0 0 H W"  */
+const EDGE = {
+  top:    {swap:false, tf:()          => ''},
+  bottom: {swap:false, tf:(W,H)       => `translate(0,${H}) scale(1,-1)`},
+  right:  {swap:true,  tf:(W,H)       => `rotate(90) translate(0,-${H})`},
+  left:   {swap:true,  tf:(W,H)       => `rotate(-90) translate(-${W},0)`},
+};
+
+/* transform-origin the animation pivots around, per edge */
+const ORIGIN = {top:'100% 0', bottom:'100% 100%', right:'100% 100%', left:'0 100%'};
+
+/* =====================================================================
+   SVG BUILDING
+   ===================================================================== */
+function orient(slug, dir, color){
+  const [vb, src] = SHAPES[slug];
+  const [,,W,H] = vb.split(/\s+/).map(Number);
+  const edge = EDGE[dir];
+
+  const paths = src.replace(/\s*fill="[^"]*"/g,'').replace(/<path/g, `<path fill="${color}"`);
+  const t = edge.tf(W,H);
+  const body = t ? `<g transform="${t}">${paths}</g>` : paths;
+  const box = edge.swap ? `0 0 ${H} ${W}` : vb;
+
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${box}" preserveAspectRatio="none">${body}</svg>`;
+}
+
+/* inline the SVG as a data URI. '#' must be %23 or it reads as a fragment;
+   angle brackets and quotes are escaped so url('…') can never be terminated early. */
+const dataUri = svg => 'data:image/svg+xml;charset=utf8,' + svg
+  .replace(/\s+/g,' ')
+  .replace(/#/g,'%23').replace(/'/g,'%27')
+  .replace(/</g,'%3C').replace(/>/g,'%3E');
+
+/* the same (shape, edge, colour) triple is asked for on every slider tick */
+const _urls = new Map();
+function svgUrl(slug, dir, color){
+  const key = slug + '|' + dir + '|' + color;
+  let u = _urls.get(key);
+  if (u === undefined){ u = dataUri(orient(slug, dir, color)); _urls.set(key, u); }
+  return u;
+}
+
+/* =====================================================================
+   STATE — one config per breakpoint tier
+   ===================================================================== */
+const defTier = () => ({dir:'top', color:'#f3f3f3', longAxis:100, shortAxis:90, position:50,
+                        flipped:false, animate:false, animLength:10, animLongAxis:4});
+
+const S = { shape:'waves-simple', responsive:false, view:'auto', tier:'desktop',
+            mobile:defTier(), tablet:defTier(), desktop:defTier() };
+
+const cur = () => S[S.tier];
+
+/* which tier the preview should paint, given the selected device frame */
+const previewTier = () => !S.responsive ? 'desktop'
+  : S.view === 'mobile-portrait' ? 'mobile'
+  : S.view === 'tablet-portrait' ? 'tablet' : 'desktop';
+
+/* position only has an effect once the shape overflows its container */
+const POS_THRESHOLD = 170;
+const posApplies = c => !c.animate && c.longAxis >= POS_THRESHOLD;
+
+/* =====================================================================
+   CSS GENERATION
+   ===================================================================== */
+function decls(c, animName){
+  const hor = HOR(c.dir);
+  const LA  = c.animate ? 100 : c.longAxis;      // animating locks the long axis to 100%
+
+  const size = hor ? `${LA}% ${c.shortAxis}px` : `${c.shortAxis}px ${LA}%`;
+  const posX = c.dir === 'left' ? 0 : c.dir === 'right'  ? 100 : c.position;
+  const posY = c.dir === 'top'  ? 0 : c.dir === 'bottom' ? 100 : c.position;
+
+  /* animate and flip both drive `transform`, so they are mutually exclusive */
+  let tf = '';
+  if (c.animate){
+    tf = `  transform: scale${hor?'X':'Y'}(${c.animLongAxis});\n`
+       + `  transform-origin: ${ORIGIN[c.dir]};\n`
+       + `  animation: ${c.animLength}s infinite alternate ${animName} linear;\n`;
+  } else if (c.flipped){
+    tf = `  transform: rotate${hor?'Y':'X'}(180deg);\n`;
+  }
+
+  return `  content: '';
+  position: absolute;
+  top: -0.1vw; right: -0.1vw; bottom: -0.1vw; left: -0.1vw;
+${tf}  background-repeat: no-repeat;
+  background-size: ${size};
+  background-position: ${posX}% ${posY}%;
+  background-image: url('${svgUrl(S.shape, c.dir, c.color)}');
+  z-index: 3;
+  pointer-events: none;`;
+}
+
+function keyframes(c, name){
+  if (!c.animate) return '';
+  const ax = HOR(c.dir) ? 'X' : 'Y', v = c.animLongAxis;
+  return `@keyframes ${name} {\n  100% { transform: scale${ax}(${v}) translate${ax}(calc(100% - (100% / ${v}))); }\n}`;
+}
+
+/* on very wide screens grow the short axis with the viewport, else the shape reads as a thin line */
+const ultrawide = c => HOR(c.dir)
+  ? `@media (min-width: 2100px) {\n  .svg_divider::before { background-size: ${c.animate?100:c.longAxis}% calc(2vw + ${c.shortAxis}px); }\n}`
+  : '';
+
+const indent = (s,n) => s.split('\n').map(l => l.trim() ? ' '.repeat(n)+l : l).join('\n');
+
+const BASE = `.svg_divider {\n  overflow: hidden;\n  position: relative;\n}`;
+
+/* mobile-first: base rules unwrapped, then each breakpoint layered on top */
+const TIERS = [
+  ['mobile',  null],
+  ['tablet',  '@media (min-width: 768px)'],
+  ['desktop', '@media (min-width: 1025px)'],
+];
+
+function tierBlock(key, mq){
+  const c = S[key];
+  const name = mq ? `shape-anim-${key}` : (S.responsive ? `shape-anim-${key}` : 'shape-anim');
+  const parts = [`.svg_divider::before {\n${decls(c,name)}\n}`, ultrawide(c), keyframes(c,name)].filter(Boolean);
+  if (!mq) return parts.join('\n\n');
+  return `${mq} {\n${indent(parts.join('\n\n'), 2)}\n}`;
+}
+
+function buildCSS(){
+  if (!S.responsive) return [BASE, tierBlock('desktop', null)].join('\n\n');
+  return [BASE, ...TIERS.map(([k,mq]) => tierBlock(k,mq))].join('\n\n');
+}
+
+const buildHTML = () => `<!-- the divider is a ::before, so your markup stays clean -->
+<div class="svg_divider">
+  <h2>Your section</h2>
+</div>`;
+
+/* =====================================================================
+   PREVIEW
+   Media queries key off the viewport, not the device frame, so the
+   selected tier's declarations are painted directly instead.
+   ===================================================================== */
+const live = document.createElement('style');
+document.head.append(live);
+
+function paint(){
+  const c = S[previewTier()];
+  live.textContent = `#pv::before{\n${decls(c,'pv-anim')}\n}\n${keyframes(c,'pv-anim')}`;
+  previewer.className = c.dir;
+  responsive_view_framer.className = S.view;
+  /* the neighbour section is what the divider fills with — keep the seam honest */
+  neighbour.style.backgroundColor = c.color;
+  tierEcho.textContent = S.responsive ? `showing ${previewTier()} tier` : 'single breakpoint';
+}
+
+/* =====================================================================
+   THEME
+   ===================================================================== */
+const THEME_KEY = 'sd-theme';
+const themeBtn = document.getElementById('theme');
+
+function applyTheme(t){
+  document.documentElement.dataset.theme = t;
+  themeBtn.textContent = t === 'dark' ? '☀' : '☾';
+  themeBtn.setAttribute('aria-pressed', String(t === 'dark'));
+  try { localStorage.setItem(THEME_KEY, t); } catch (e) {}
+  restyleThumbs();
+}
+themeBtn.onclick = () =>
+  applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
+
+/* follow the OS until the user states a preference of their own */
+matchMedia('(prefers-color-scheme: light)').addEventListener('change', e => {
+  let saved = null;
+  try { saved = localStorage.getItem(THEME_KEY); } catch (err) {}
+  if (!saved) applyTheme(e.matches ? 'light' : 'dark');
+});
+
+/* =====================================================================
+   UI
+   ===================================================================== */
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+const el = {
+  shape:$('#shape'), responsive:$('#responsive'), color:$('#color'),
+  longAxis:$('#long_axis'), shortAxis:$('#short_axis'), position:$('#position'),
+  flipped:$('#flipped'), animate:$('#animate'),
+  animLength:$('#animation_length'), animLongAxis:$('#animation_long_axis'),
+  out:$('#out'), tierName:$('#tierName'),
+  wrapLong:$('#wrapLong'), wrapPos:$('#wrapPos'), wrapFlip:$('#wrapFlip'),
+  wrapAnimLen:$('#wrapAnimLen'), wrapAnimLong:$('#wrapAnimLong'), tierPick:$('#tierPick'),
+};
+
+NAMES.forEach(n => el.shape.add(new Option(n, n)));
+el.shape.value = S.shape;
+
+const press = (sel, attr, val) =>
+  $$(sel).forEach(b => b.setAttribute('aria-pressed', String(b.dataset[attr] === val)));
+
+let cssCache = '';
+
+function syncControls(){
+  const c = cur();
+  press('#dirSeg button','dir', c.dir);
+  press('#tierSeg button','tier', S.tier);
+  press('#viewSeg button','view', S.view);
+
+  el.color.value = c.color;
+  el.longAxis.value = c.longAxis;         $('#vLong').textContent = c.longAxis;
+  el.shortAxis.value = c.shortAxis;       $('#vShort').textContent = c.shortAxis;
+  el.position.value = c.position;         $('#vPos').textContent = c.position;
+  el.animLength.value = c.animLength;     $('#vAnimLen').textContent = c.animLength;
+  el.animLongAxis.value = c.animLongAxis; $('#vAnimLong').textContent = c.animLongAxis;
+  el.flipped.checked = c.flipped;
+  el.animate.checked = c.animate;
+
+  /* animate owns the transform, so long axis / position / flip have nothing to say */
+  el.wrapLong.classList.toggle('hidden', c.animate);
+  el.wrapFlip.classList.toggle('hidden', c.animate);
+  el.wrapPos.classList.toggle('hidden', !posApplies(c));
+  el.wrapAnimLen.classList.toggle('hidden', !c.animate);
+  el.wrapAnimLong.classList.toggle('hidden', !c.animate);
+
+  el.tierPick.classList.toggle('hidden', !S.responsive);
+  el.tierName.textContent = S.responsive ? S.tier : '';
+}
+
+let tab = 'css';
+const emit = () => { el.out.textContent = tab === 'css' ? cssCache : buildHTML(); };
+
+function refresh(){
+  syncControls();
+  paint();
+  cssCache = buildCSS();
+  emit();
+}
+
+/* --- bindings --- */
+el.shape.onchange = e => { S.shape = e.target.value; syncGallery(); refresh(); };
+
+el.responsive.onchange = e => {
+  S.responsive = e.target.checked;
+  if (!S.responsive) S.tier = 'desktop';
+  refresh();
+};
+
+const segHandler = (id, fn) => $(id).addEventListener('click', e => {
+  const b = e.target.closest('button');
+  if (b) { fn(b.dataset); refresh(); }
+});
+segHandler('#tierSeg', d => S.tier = d.tier);
+segHandler('#viewSeg', d => S.view = d.view);
+segHandler('#dirSeg',  d => cur().dir = d.dir);
+
+const bindRange = (node, key) => node.addEventListener('input', e => { cur()[key] = +e.target.value; refresh(); });
+bindRange(el.longAxis,'longAxis');
+bindRange(el.shortAxis,'shortAxis');
+bindRange(el.position,'position');
+bindRange(el.animLength,'animLength');
+bindRange(el.animLongAxis,'animLongAxis');
+
+el.color.addEventListener('input', e => { cur().color = e.target.value; refresh(); });
+el.flipped.onchange = e => { cur().flipped = e.target.checked; refresh(); };
+el.animate.onchange = e => { cur().animate = e.target.checked; refresh(); };
+
+$$('.tab').forEach(t => t.onclick = () => {
+  tab = t.dataset.tab;
+  $$('.tab').forEach(x => x.setAttribute('aria-selected', String(x === t)));
+  emit();
+});
+
+$('#copy').onclick = async () => {
+  const text = tab === 'css' ? cssCache : buildHTML();
+  try { await navigator.clipboard.writeText(text); }
+  catch (e) {
+    const ta = document.createElement('textarea');
+    ta.value = text; document.body.append(ta); ta.select();
+    document.execCommand('copy'); ta.remove();
+  }
+  const t = $('#toast');
+  t.textContent = `Copied ${tab.toUpperCase()}`;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1300);
+};
+
+/* --- gallery --- */
+const gal = $('#gal'), galgrid = $('#galgrid');
+
+NAMES.forEach(n => {
+  const b = document.createElement('button');
+  b.className = 'card';
+  b.dataset.name = n;
+  b.innerHTML = `<span class="th"></span><span class="nm">${n}</span>`;
+  b.onclick = () => { S.shape = n; el.shape.value = n; syncGallery(); refresh(); gal.close(); };
+  galgrid.append(b);
+});
+
+/* thumbnails are tinted with the accent, which moves with the theme */
+function restyleThumbs(){
+  const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim();
+  $$('#galgrid .card').forEach(c => {
+    c.querySelector('.th').style.backgroundImage = `url('${svgUrl(c.dataset.name,'top',accent)}')`;
+  });
+}
+const syncGallery = () => $$('#galgrid .card')
+  .forEach(c => c.setAttribute('aria-pressed', String(c.dataset.name === S.shape)));
+
+$('#openGal').onclick  = () => { syncGallery(); gal.showModal(); };
+$('#closeGal').onclick = () => gal.close();
+
+applyTheme(document.documentElement.dataset.theme);
+refresh();
+syncGallery();
+</script>
+</body>
+</html>

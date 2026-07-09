@@ -1,0 +1,867 @@
+/* Modern Design System for Section Dividers Showcase — Light Theme */
+:root {
+  --font-sans: 'Outfit', 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* Surfaces */
+  --color-bg: #ffffff;
+  --color-bg-soft: #f8fafc;
+  --color-bg-card: #ffffff;
+  --color-border: #e2e8f0;
+  --color-border-strong: #cbd5e1;
+
+  /* Text */
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #475569;
+  --color-text-muted: #94a3b8;
+
+  /* Brand */
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-primary-soft: #eef2ff;
+  --color-primary-glow: rgba(79, 70, 229, 0.18);
+
+  --color-secondary: #0891b2;
+  --color-success: #059669;
+
+  /* Showcase section backgrounds — kept SOLID so divider fills match exactly */
+  --sec-playground: #f1f5f9;
+  --sec-hero: #eef2ff;
+  --sec-features: #ecfeff;
+  --sec-stats: #f5f3ff;
+  --sec-testimonials: #fff7ed;
+  --sec-gallery: #ecfdf5;
+  --sec-cta: #f8fafc;
+  --sec-footer: #e2e8f0;
+}
+
+/* Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+p {
+  color: var(--color-text-secondary);
+}
+
+/* Layout Utilities */
+.container {
+  width: 100%;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* Navbar */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+  transition: all 0.3s ease;
+}
+
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 72px;
+}
+
+.logo {
+  font-size: 1.35rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #4f46e5, #0891b2);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--color-secondary);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(8, 145, 178, 0.5);
+}
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+}
+
+.nav-links a {
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.nav-links a:hover {
+  color: var(--color-text-primary);
+}
+
+.nav-btn {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+  background: var(--color-bg-soft);
+  border-color: var(--color-border-strong);
+}
+
+/* Hero Section */
+.hero {
+  position: relative;
+  padding: 160px 0 120px;
+  text-align: center;
+  background: radial-gradient(circle at 50% -20%, rgba(79, 70, 229, 0.12) 0%, transparent 60%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 99px;
+  background: var(--color-primary-soft);
+  border: 1px solid #c7d2fe;
+  color: #4338ca;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+}
+
+.hero h1 {
+  font-size: 3.5rem;
+  max-width: 800px;
+  margin: 0 auto 20px;
+  color: var(--color-text-primary);
+}
+
+.hero p {
+  font-size: 1.15rem;
+  max-width: 600px;
+  margin: 0 auto 36px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.btn-primary {
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 14px var(--color-primary-glow);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: var(--color-primary-hover);
+  transform: translateY(-1px);
+}
+
+.btn-secondary {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: var(--color-bg-soft);
+  border-color: var(--color-border-strong);
+}
+
+/* Interactive Playground Section */
+.playground-section {
+  padding: 100px 0;
+  background: var(--sec-playground);
+  border-top: 1px solid var(--color-border);
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+.section-header h2 {
+  font-size: 2.25rem;
+  margin-bottom: 12px;
+}
+
+.section-header p {
+  font-size: 1.05rem;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.playground-grid {
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+@media (max-width: 992px) {
+  .playground-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Controls Panel */
+.panel {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.panel-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.control-group {
+  margin-bottom: 24px;
+}
+
+.control-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 10px;
+}
+
+/* Custom Select */
+.select-wrapper {
+  position: relative;
+}
+
+.custom-select {
+  width: 100%;
+  background: var(--color-bg-soft);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-primary);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: all 0.2s ease;
+}
+
+.custom-select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
+}
+
+.select-wrapper::after {
+  content: '▼';
+  font-size: 0.7rem;
+  color: var(--color-text-muted);
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* Slider Style */
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.slider-container input[type="range"] {
+  flex: 1;
+  height: 6px;
+  border-radius: 3px;
+  background: #e2e8f0;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.slider-container input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
+  transition: transform 0.1s ease;
+}
+
+.slider-container input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+.slider-value {
+  font-family: monospace;
+  font-size: 0.9rem;
+  background: var(--color-bg-soft);
+  padding: 4px 8px;
+  border-radius: 4px;
+  min-width: 50px;
+  text-align: center;
+  border: 1px solid var(--color-border);
+}
+
+/* Color Options / Preset Grids */
+.color-presets {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.preset-btn {
+  height: 36px;
+  border-radius: 6px;
+  border: 1px solid var(--color-border-strong);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.preset-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: inherit;
+}
+
+.preset-btn.active {
+  border-color: var(--color-primary);
+  transform: scale(1.05);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
+}
+
+/* Option Checkboxes/Toggles */
+.toggle-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.toggle-card {
+  background: var(--color-bg-soft);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.toggle-card:hover {
+  background: #f1f5f9;
+  border-color: var(--color-border-strong);
+}
+
+.toggle-card.active {
+  background: var(--color-primary-soft);
+  border-color: var(--color-primary);
+  color: #4338ca;
+}
+
+.toggle-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-text-muted);
+  transition: all 0.2s ease;
+}
+
+.toggle-card.active .toggle-dot {
+  background: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-glow);
+}
+
+/* Interactive Preview Display */
+.preview-container {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  overflow: hidden;
+  height: 100%;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 8px 24px rgba(15, 23, 42, 0.04);
+}
+
+.preview-title-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg-soft);
+}
+
+.preview-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+}
+
+.preview-badge {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: var(--color-success);
+}
+
+.preview-display {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  min-height: 280px;
+  overflow: hidden;
+}
+
+/* overflow stays visible: a divider taller than Alpha must spill down into Beta */
+.preview-top {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  background: linear-gradient(180deg, #eef2ff, #e0e7ff);
+  transition: background 0.3s ease;
+  position: relative;
+}
+
+.preview-bottom {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 24px;
+  background: #ffffff;
+  transition: background 0.3s ease;
+  position: relative;
+}
+
+.preview-text {
+  font-weight: 700;
+  font-size: 1.5rem;
+  text-align: center;
+  color: var(--color-text-primary);
+  position: relative;
+  z-index: 20; /* above .shape-divider, which now lives inside .preview-top */
+}
+
+/* Shape divider container inside section.
+   The -1px offset overlaps the seam so no subpixel hairline can show through
+   when the SVG height rounds to a fractional device pixel. */
+.shape-divider {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  line-height: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.shape-divider.bottom {
+  bottom: -1px;
+}
+
+.shape-divider.top {
+  top: -1px;
+}
+
+.shape-divider svg {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 60px; /* overridden per-divider */
+  transition: height 0.2s ease, transform 0.2s ease;
+}
+
+/* Showcase dividers take their fill from the section they sit in, so the fill
+   can never drift out of sync with the background of the section below. */
+.stacked-sec > .shape-divider svg,
+.showcase-lead-in > .shape-divider svg {
+  fill: var(--divider-fill);
+}
+
+/* Code Inspector Panel (stays dark — it's a code surface, not the page theme) */
+.code-inspector {
+  margin-top: 24px;
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid #1e293b;
+}
+
+.code-title {
+  font-size: 0.8rem;
+  font-family: monospace;
+  color: #94a3b8;
+}
+
+.copy-btn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid #334155;
+  color: #f8fafc;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.copy-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #475569;
+}
+
+.code-body {
+  padding: 16px;
+  overflow-x: auto;
+  max-height: 220px;
+}
+
+.code-body pre {
+  margin: 0;
+}
+
+.code-body code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.8rem;
+  color: #a5b4fc;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Showcase Section - Live Landing Page Demo */
+.showcase-section {
+  background: var(--color-bg);
+}
+
+/* Lead-in strip carrying the playground -> showcase divider */
+.showcase-lead-in {
+  position: relative;
+  overflow: hidden;
+  height: 100px;
+  background: var(--sec-playground);
+  --divider-fill: var(--sec-hero);
+}
+
+/* Custom styled stacked sections to show dividers in context */
+.stacked-sec {
+  position: relative;
+  overflow: hidden;
+  padding: 120px 24px 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  min-height: 480px;
+}
+
+.stacked-content {
+  max-width: 700px;
+  margin: 0 auto;
+  z-index: 5;
+}
+
+.stacked-sec h3 {
+  font-size: 2.5rem;
+  margin-bottom: 16px;
+  color: var(--color-text-primary);
+}
+
+.stacked-sec p {
+  font-size: 1.1rem;
+  color: var(--color-text-secondary);
+}
+
+/* Showcase section colors.
+   Each section declares its own background AND the background of the section
+   directly below it (--divider-fill). Keep the two in lockstep when reordering. */
+.sec-hero {
+  background: var(--sec-hero);
+  --divider-fill: var(--sec-features);
+}
+
+.sec-features {
+  background: var(--sec-features);
+  --divider-fill: var(--sec-stats);
+}
+
+.sec-stats {
+  background: var(--sec-stats);
+  --divider-fill: var(--sec-testimonials);
+}
+
+.sec-testimonials {
+  background: var(--sec-testimonials);
+  --divider-fill: var(--sec-gallery);
+}
+
+.sec-gallery {
+  background: var(--sec-gallery);
+  --divider-fill: var(--sec-cta);
+}
+
+.sec-cta {
+  background: var(--sec-cta);
+  --divider-fill: var(--sec-footer);
+}
+
+/* Section Grid Cards */
+.feature-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 48px;
+  width: 100%;
+  max-width: 1000px;
+}
+
+@media (max-width: 768px) {
+  .feature-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.feat-card {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: left;
+  transition: all 0.2s ease;
+}
+
+.feat-card:hover {
+  transform: translateY(-4px);
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.feat-icon {
+  font-size: 1.75rem;
+  margin-bottom: 16px;
+  display: inline-block;
+}
+
+.feat-card h4 {
+  font-size: 1.15rem;
+  margin-bottom: 8px;
+  color: var(--color-text-primary);
+}
+
+.feat-card p {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+/* Inline helpers used by the showcase copy */
+.active-divider-note {
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--color-primary);
+}
+
+.stat-row {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  align-items: stretch;
+  margin-top: 48px;
+}
+
+.stat-value {
+  font-size: 2.5rem;
+  font-weight: 800;
+  color: var(--color-text-primary);
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+}
+
+.stat-rule {
+  border-left: 1px solid var(--color-border-strong);
+}
+
+.pill {
+  margin-top: 36px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  padding: 12px 20px;
+  border-radius: 99px;
+  border: 1px solid var(--color-border);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Footer */
+footer {
+  background: var(--sec-footer);
+  padding: 60px 0 40px;
+  text-align: center;
+}
+
+.footer-logo {
+  display: inline-flex;
+  margin-bottom: 20px;
+}
+
+.footer-text {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  max-width: 450px;
+  margin: 0 auto 24px;
+}
+
+.copyright {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border-strong);
+  padding-top: 24px;
+  margin-top: 24px;
+}
+
+/* Toast Notification for Clipboard Copy */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--color-success);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 1000;
+}
+
+.toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Rotating SVGs upside down */
+.rotate-180 {
+  transform: rotate(180deg);
+}
+.flip-x {
+  transform: scaleX(-1);
+}
+.rotate-180.flip-x {
+  transform: rotate(180deg) scaleX(-1);
+}

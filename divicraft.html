@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DiviCraft · High-Fidelity SVG Section Dividers Playground</title>
+  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="An interactive playground and showcase of gorgeous, lightweight SVG section dividers for modern web design. Inspired by Zenplates.">
+  <meta name="keywords" content="svg dividers, section dividers, shape dividers, web design patterns, css section splitters">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Load Extracted Shape Data first -->
+  <script src="shapes.js"></script>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar" id="navbar">
+    <div class="container navbar-container">
+      <a href="#" class="logo">
+        <div class="logo-dot"></div>
+        DiviCraft
+      </a>
+      <div class="nav-links">
+        <a href="#playground">Playground</a>
+        <a href="#showcase">Showcase</a>
+      </div>
+      <a href="#playground" class="nav-btn">Start Designing</a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero">
+    <div class="container">
+      <span class="hero-badge">Aesthetics & Performance</span>
+      <h1>Sculpt Your Web Sections With Pure SVGs</h1>
+      <p>Transform boring straight splits into beautiful, flowing transitions. Light on load, perfectly responsive, and infinitely customizable.</p>
+      <div class="hero-actions">
+        <a href="#playground" class="btn-primary">Open Playground</a>
+        <a href="#showcase" class="btn-secondary">View Showcase</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Playground Section -->
+  <section class="playground-section" id="playground">
+    <div class="container">
+      <div class="section-header">
+        <h2>Interactive Playground</h2>
+        <p>Choose a pattern, tweak parameters in real-time, and grab the clean, copy-pasteable HTML/CSS code instantly.</p>
+      </div>
+
+      <div class="playground-grid">
+        <!-- Controls Panel (Left) -->
+        <div class="panel">
+          <div class="panel-title">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary)">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.5 1z"></path>
+            </svg>
+            Configuration
+          </div>
+
+          <!-- Divider Style -->
+          <div class="control-group">
+            <label for="shape-select">Divider Pattern</label>
+            <div class="select-wrapper">
+              <select id="shape-select" class="custom-select">
+                <!-- Javascript will populate this -->
+              </select>
+            </div>
+          </div>
+
+          <!-- Height Control -->
+          <div class="control-group">
+            <label for="height-slider">Divider Height</label>
+            <div class="slider-container">
+              <input type="range" id="height-slider" min="20" max="250" value="80">
+              <span class="slider-value" id="height-value">80px</span>
+            </div>
+          </div>
+
+          <!-- Color Combinations Presets -->
+          <div class="control-group">
+            <label>Color Theme Preset</label>
+            <div class="color-presets" id="color-presets">
+              <button class="preset-btn active" data-top-start="#eef2ff" data-top-end="#e0e7ff" data-bottom="#ffffff" style="background: linear-gradient(180deg, #eef2ff, #e0e7ff);"></button>
+              <button class="preset-btn" data-top-start="#ecfeff" data-top-end="#cffafe" data-bottom="#f8fafc" style="background: linear-gradient(180deg, #ecfeff, #cffafe);"></button>
+              <button class="preset-btn" data-top-start="#f5f3ff" data-top-end="#ddd6fe" data-bottom="#ffffff" style="background: linear-gradient(180deg, #f5f3ff, #ddd6fe);"></button>
+              <button class="preset-btn" data-top-start="#fff7ed" data-top-end="#fed7aa" data-bottom="#fffbeb" style="background: linear-gradient(180deg, #fff7ed, #fed7aa);"></button>
+            </div>
+          </div>
+
+          <!-- Flips / Transforms -->
+          <div class="control-group">
+            <label>Flip & Options</label>
+            <div class="toggle-grid">
+              <div class="toggle-card" id="toggle-flip-y">
+                <div class="toggle-dot"></div>
+                Invert Vertically
+              </div>
+              <div class="toggle-card" id="toggle-flip-x">
+                <div class="toggle-dot"></div>
+                Mirror Horizontally
+              </div>
+              <div class="toggle-card" id="toggle-top-divider">
+                <div class="toggle-dot"></div>
+                Position Top
+              </div>
+              <div class="toggle-card" id="toggle-curves-opaque">
+                <div class="toggle-dot"></div>
+                Opaque Layers
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview & Code Block (Right) -->
+        <div class="preview-column">
+          <div class="preview-container">
+            <div class="preview-title-bar">
+              <span class="preview-title">Live Preview</span>
+              <span class="preview-badge">Scalable Vector</span>
+            </div>
+            
+            <div class="preview-display">
+              <!-- Top Section (owns the divider, so the divider lands on the seam
+                   between Alpha and Beta rather than at the foot of the preview) -->
+              <div class="preview-top" id="preview-top">
+                <span class="preview-text">Section Alpha</span>
+
+                <!-- Divider Container -->
+                <div class="shape-divider bottom" id="preview-divider">
+                  <!-- SVG dynamically injected here -->
+                </div>
+              </div>
+
+              <!-- Bottom Section -->
+              <div class="preview-bottom" id="preview-bottom">
+                <span class="preview-text">Section Beta</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Code Output -->
+          <div class="code-inspector">
+            <div class="code-header">
+              <span class="code-title">HTML & CSS Snippet</span>
+              <button class="copy-btn" id="copy-code-btn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                </svg>
+                Copy Code
+              </button>
+            </div>
+            <div class="code-body">
+              <pre><code id="code-output">Loading code snippet...</code></pre>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Showcase Section -->
+  <section class="showcase-section" id="showcase">
+    <!-- Divider: Wave from Playground -> Showcase -->
+    <div class="showcase-lead-in">
+      <div class="shape-divider bottom">
+        <svg viewBox="0 0 1000 100" preserveAspectRatio="none" style="height: 100px;">
+          <path d="M421.9,6.5c22.6-2.5,51.5,0.4,75.5,5.3c23.6,4.9,70.9,23.5,100.5,35.7c75.8,32.2,133.7,44.5,192.6,49.7 c23.6,2.1,48.7,3.5,103.4-2.5c54.7-6,106.2-25.6,106.2-25.6V0H0v30.3c0,0,72,32.6,158.4,30.5c39.2-0.7,92.8-6.7,134-22.4 c21.2-8.1,52.2-18.2,79.7-24.2C399.3,7.9,411.6,7.5,421.9,6.5z"></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Section 1: Hero split showing diagonal -->
+    <div class="stacked-sec sec-hero">
+      <div class="stacked-content">
+        <h3>Section One: Fluid Diagonal Split</h3>
+        <p>Angle things up for a dynamic tech feel. Perfect for hero-to-features transitions. This section has a soft indigo tint, splitting into a pale cyan below using a sharp diagonal divider.</p>
+        <div class="feature-cards">
+          <div class="feat-card">
+            <span class="feat-icon">⚡</span>
+            <h4>Fast Loading</h4>
+            <p>Under 1KB each. No heavy image requests, completely code-driven.</p>
+          </div>
+          <div class="feat-card">
+            <span class="feat-icon">📐</span>
+            <h4>Vector Perfect</h4>
+            <p>Looks razor-sharp on Retina and 4K displays. Scales to any width.</p>
+          </div>
+          <div class="feat-card">
+            <span class="feat-icon">🎨</span>
+            <h4>Tailored Styling</h4>
+            <p>Change color dynamically with CSS variables or Tailwind utility classes.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Divider: Diagonal pointing down -->
+      <div class="shape-divider bottom">
+        <svg viewBox="0 0 1000 100" preserveAspectRatio="none" style="height: 100px;">
+          <path d="M0,6V0h1000v100L0,6z" style="transform: scaleY(-1); transform-origin: center;"></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Section 2: Features showing layered mountains -->
+    <div class="stacked-sec sec-features">
+      <div class="stacked-content">
+        <h3>Section Two: Layered Mountains</h3>
+        <p>Create organic landscape vibes. Using semi-transparent paths, you can layer colors to generate depth and atmosphere. Below, we transition from pale cyan to a soft violet utilizing the mountains divider.</p>
+        <div style="margin-top: 32px;">
+          <span class="active-divider-note">Active Divider: Mountains (3 Layers)</span>
+        </div>
+      </div>
+
+      <!-- Divider: Mountains (with translucency) -->
+      <div class="shape-divider bottom">
+        <svg viewBox="0 0 1000 100" preserveAspectRatio="none" style="height: 120px;">
+          <path opacity="0.33" d="M473,67.3c-203.9,88.3-263.1-34-320.3,0C66,119.1,0,59.7,0,59.7V0h1000v59.7 c0,0-62.1,26.1-94.9,29.3c-32.8,3.3-62.8-12.3-75.8-22.1C806,49.6,745.3,8.7,694.9,4.7S492.4,59,473,67.3z"></path>
+          <path opacity="0.66" d="M734,67.3c-45.5,0-77.2-23.2-129.1-39.1c-28.6-8.7-150.3-10.1-254,39.1 s-91.7-34.4-149.2,0C115.7,118.3,0,39.8,0,39.8V0h1000v36.5c0,0-28.2-18.5-92.1-18.5C810.2,18.1,775.7,67.3,734,67.3z"></path>
+          <path d="M766.1,28.9c-200-57.5-266,65.5-395.1,19.5C242,1.8,242,5.4,184.8,20.6C128,35.8,132.3,44.9,89.9,52.5C28.6,63.7,0,0,0,0 h1000c0,0-9.9,40.9-83.6,48.1S829.6,47,766.1,28.9z"></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Section 3: Stats showing Wave -->
+    <div class="stacked-sec sec-stats">
+      <div class="stacked-content">
+        <h3>Section Three: Deep Organic Waves</h3>
+        <p>A classic, smooth wave partition that gives an elegant and modern feeling. Great for SaaS landing pages and digital agencies. Transitions into a warm amber section using a wave divider.</p>
+        <div class="stat-row">
+          <div>
+            <div class="stat-value">99%</div>
+            <div class="stat-label">Score</div>
+          </div>
+          <div class="stat-rule"></div>
+          <div>
+            <div class="stat-value">12+</div>
+            <div class="stat-label">Styles</div>
+          </div>
+          <div class="stat-rule"></div>
+          <div>
+            <div class="stat-value">0px</div>
+            <div class="stat-label">Gaps</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Divider: Waves -->
+      <div class="shape-divider bottom">
+        <svg viewBox="0 0 283.5 27.8" preserveAspectRatio="none" style="height: 70px;">
+          <path d="M283.5,9.7c0,0-7.3,4.3-14,4.6c-6.8,0.3-12.6,0-20.9-1.5c-11.3-2-33.1-10.1-44.7-5.7 s-12.1,4.6-18,7.4c-6.6,3.2-20,9.6-36.6,9.3C131.6,23.5,99.5,7.2,86.3,8c-1.4,0.1-6.6,0.8-10.5,2c-3.8,1.2-9.4,3.8-17,4.7 c-3.2,0.4-8.3,1.1-14.2,0.9c-1.5-0.1-6.3-0.4-12-1.6c-5.7-1.2-11-3.1-15.8-3.7C6.5,9.2,0,10.8,0,10.8V0h283.5V9.7z M260.8,11.3 c-0.7-1-2-0.4-4.3-0.4c-2.3,0-6.1-1.2-5.8-1.1c0.3,0.1,3.1,1.5,6,1.9C259.7,12.2,261.4,12.3,260.8,11.3z M242.4,8.6 c0,0-2.4-0.2-5.6-0.9c-3.2-0.8-10.3-2.8-15.1-3.5c-8.2-1.1-15.8,0-15.1,0.1c0.8,0.1,9.6-0.6,17.6,1.1c3.3,0.7,9.3,2.2,12.4,2.7 C239.9,8.7,242.4,8.6,242.4,8.6z M185.2,8.5c1.7-0.7-13.3,4.7-18.5,6.1c-2.1,0.6-6.2,1.6-10,2c-3.9,0.4-8.9,0.4-8.8,0.5 c0,0.2,5.8,0.8,11.2,0c5.4-0.8,5.2-1.1,7.6-1.6C170.5,14.7,183.5,9.2,185.2,8.5z M199.1,6.9c0.2,0-0.8-0.4-4.8,1.1 c-4,1.5-6.7,3.5-6.9,3.7c-0.2,0.1,3.5-1.8,6.6-3C197,7.5,199,6.9,199.1,6.9z M283,6c-0.1,0.1-1.9,1.1-4.8,2.5s-6.9,2.8-6.7,2.7 c0.2,0,3.5-0.6,7.4-2.5C282.8,6.8,283.1,5.9,283,6z M31.3,11.6c0.1-0.2-1.9-0.2-4.5-1.2s-5.4-1.6-7.8-2C15,7.6,7.3,8.5,7.7,8.6 C8,8.7,15.9,8.3,20.2,9.3c2.2,0.5,2.4,0.5,5.7,1.6S31.2,11.9,31.3,11.6z M73,9.2c0.4-0.1,3.5-1.6,8.4-2.6c4.9-1.1,8.9-0.5,8.9-0.8 c0-0.3-1-0.9-6.2-0.3S72.6,9.3,73,9.2z M71.6,6.7C71.8,6.8,75,5.4,77.3,5c2.3-0.3,1.9-0.5,1.9-0.6c0-0.1-1.1-0.2-2.7,0.2 C74.8,5.1,71.4,6.6,71.6,6.7z M93.6,4.4c0.1,0.2,3.5,0.8,5.6,1.8c2.1,1,1.8,0.6,1.9,0.5c0.1-0.1-0.8-0.8-2.4-1.3 C97.1,4.8,93.5,4.2,93.6,4.4z M65.4,11.1c-0.1,0.3,0.3,0.5,1.9-0.2s2.6-1.3,2.2-1.2s-0.9,0.4-2.5,0.8C65.3,10.9,65.5,10.8,65.4,11.1 z M34.5,12.4c-0.2,0,2.1,0.8,3.3,0.9c1.2,0.1,2,0.1,2-0.2c0-0.3-0.1-0.5-1.6-0.4C36.6,12.8,34.7,12.4,34.5,12.4z M152.2,21.1 c-0.1,0.1-2.4-0.3-7.5-0.3c-5,0-13.6-2.4-17.2-3.5c-3.6-1.1,10,3.9,16.5,4.1C150.5,21.6,152.3,21,152.2,21.1z"></path> <path d="M269.6,18c-0.1-0.1-4.6,0.3-7.2,0c-7.3-0.7-17-3.2-16.6-2.9c0.4,0.3,13.7,3.1,17,3.3 C267.7,18.8,269.7,18,269.6,18z"></path> <path d="M227.4,9.8c-0.2-0.1-4.5-1-9.5-1.2c-5-0.2-12.7,0.6-12.3,0.5c0.3-0.1,5.9-1.8,13.3-1.2 S227.6,9.9,227.4,9.8z"></path> <path d="M204.5,13.4c-0.1-0.1,2-1,3.2-1.1c1.2-0.1,2,0,2,0.3c0,0.3-0.1,0.5-1.6,0.4 C206.4,12.9,204.6,13.5,204.5,13.4z"></path> <path d="M201,10.6c0-0.1-4.4,1.2-6.3,2.2c-1.9,0.9-6.2,3.1-6.1,3.1c0.1,0.1,4.2-1.6,6.3-2.6 S201,10.7,201,10.6z"></path> <path d="M154.5,26.7c-0.1-0.1-4.6,0.3-7.2,0c-7.3-0.7-17-3.2-16.6-2.9c0.4,0.3,13.7,3.1,17,3.3 C152.6,27.5,154.6,26.8,154.5,26.7z"></path> <path d="M41.9,19.3c0,0,1.2-0.3,2.9-0.1c1.7,0.2,5.8,0.9,8.2,0.7c4.2-0.4,7.4-2.7,7-2.6 c-0.4,0-4.3,2.2-8.6,1.9c-1.8-0.1-5.1-0.5-6.7-0.4S41.9,19.3,41.9,19.3z"></path> <path d="M75.5,12.6c0.2,0.1,2-0.8,4.3-1.1c2.3-0.2,2.1-0.3,2.1-0.5c0-0.1-1.8-0.4-3.4,0 C76.9,11.5,75.3,12.5,75.5,12.6z"></path> <path d="M15.6,13.2c0-0.1,4.3,0,6.7,0.5c2.4,0.5,5,1.9,5,2c0,0.1-2.7-0.8-5.1-1.4 C19.9,13.7,15.7,13.3,15.6,13.2z"></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Section 4: Testimonials showing clouds -->
+    <div class="stacked-sec sec-testimonials">
+      <div class="stacked-content">
+        <h3>Section Four: Clouds & Puff</h3>
+        <p>Add a fun, friendly curve. Fantastic for children's web apps, organic products, or creative portfolios. This warm amber section meets a fresh mint gallery below using cloud shapes.</p>
+        <div class="pill">
+          <span style="font-size: 1.25rem;">☁️</span>
+          <span>Playful, organic edge</span>
+        </div>
+      </div>
+
+      <!-- Divider: Clouds -->
+      <div class="shape-divider bottom">
+        <svg viewBox="0 0 283.5 27.8" preserveAspectRatio="none" style="height: 60px;">
+          <path d="M0 0v6.7c1.9-.8 4.7-1.4 8.5-1 9.5 1.1 11.1 6 11.1 6s2.1-.7 4.3-.2c2.1.5 2.8 2.6 2.8 2.6s.2-.5 1.4-.7c1.2-.2 1.7.2 1.7.2s0-2.1 1.9-2.8c1.9-.7 3.6.7 3.6.7s.7-2.9 3.1-4.1 4.7 0 4.7 0 1.2-.5 2.4 0 1.7 1.4 1.7 1.4h1.4c.7 0 1.2.7 1.2.7s.8-1.8 4-2.2c3.5-.4 5.3 2.4 6.2 4.4.4-.4 1-.7 1.8-.9 2.8-.7 4 .7 4 .7s1.7-5 11.1-6c9.5-1.1 12.3 3.9 12.3 3.9s1.2-4.8 5.7-5.7c4.5-.9 6.8 1.8 6.8 1.8s.6-.6 1.5-.9c.9-.2 1.9-.2 1.9-.2s5.2-6.4 12.6-3.3c7.3 3.1 4.7 9 4.7 9s1.9-.9 4 0 2.8 2.4 2.8 2.4 1.9-1.2 4.5-1.2 4.3 1.2 4.3 1.2.2-1 1.4-1.7 2.1-.7 2.1-.7-.5-3.1 2.1-5.5 5.7-1.4 5.7-1.4 1.5-2.3 4.2-1.1c2.7 1.2 1.7 5.2 1.7 5.2s.3-.1 1.3.5c.5.4.8.8.9 1.1.5-1.4 2.4-5.8 8.4-4 7.1 2.1 3.5 8.9 3.5 8.9s.8-.4 2 0 1.1 1.1 1.1 1.1 1.1-1.1 2.3-1.1 2.1.5 2.1.5 1.9-3.6 6.2-1.2 1.9 6.4 1.9 6.4 2.6-2.4 7.4 0c3.4 1.7 3.9 4.9 3.9 4.9s3.3-6.9 10.4-7.9 11.5 2.6 11.5 2.6.8 0 1.2.2c.4.2.9.9.9.9s4.4-3.1 8.3.2c1.9 1.7 1.5 5 1.5 5s.3-1.1 1.6-1.4c1.3-.3 2.3.2 2.3.2s-.1-1.2.5-1.9 1.9-.9 1.9-.9-4.7-9.3 4.4-13.4c5.6-2.5 9.2.9 9.2.9s5-6.2 15.9-6.2 16.1 8.1 16.1 8.1.7-.2 1.6-.4V0H0z"></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Section 5: Gallery showing hills -->
+    <div class="stacked-sec sec-gallery">
+      <div class="stacked-content">
+        <h3>Section Five: Translucent Hills</h3>
+        <p>Layering multiple hills adds depth and visual texture. This mint section utilizes the multi-layered hills pattern to shift into a clean solid background below.</p>
+        <div style="margin-top: 32px;">
+          <span class="active-divider-note">Active Divider: Hills (3 Layers)</span>
+        </div>
+      </div>
+
+      <!-- Divider: Hills -->
+      <div class="shape-divider bottom">
+        <svg viewBox="0 0 240 24" preserveAspectRatio="none" style="height: 80px;">
+          <path fill-opacity="0.33" d="M240,24V0c-69.5,0-73.2,14.8-98,17.8c-24.7,3-49.9-4.3-69.8-4.2C53,13.8,50.3,18,30.2,20.9 C15.6,23.5,4.3,19.6,0,19v5H240z"></path>
+          <path fill-opacity="0.33" d="M240,24V3c-51.8,0-73.2,11.8-98,14.8c-24.7,3-49.9-2.3-69.8-2.2C53,15.8,50.3,18,30.2,20.9 C15.6,23.5,4.3,22.6,0,22v2H240z"></path>
+          <path d="M240,24V5c-51.8,0-73.2,10.8-98,13.8c-24.7,3-49.9-1.3-69.8-1.2C53,17.8,50.3,19,30.2,21.9 C15.6,24.5,4.3,23.6,0,23v1H240z"></path>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Section 6: CTA showing Book -->
+    <div class="stacked-sec sec-cta">
+      <div class="stacked-content">
+        <h3>Need More Patterns?</h3>
+        <p>Simply use the interactive editor above to customize, copy, and construct your own beautiful web templates using responsive, light SVGs.</p>
+        <div style="margin-top: 36px;">
+          <a href="#playground" class="btn-primary">Scroll Back To Playground</a>
+        </div>
+      </div>
+      
+      <!-- Divider: Book pointing down -->
+      <div class="shape-divider bottom">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none" style="height: 60px;">
+          <path d="M1200,0H0V120H281.94C572.9,116.24,602.45,3.86,602.45,3.86h0S632,116.24,923,120h277Z" style="transform: scaleY(-1); transform-origin: center;"></path>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-logo">
+        <a href="#" class="logo" style="font-size: 1.6rem;">
+          <div class="logo-dot"></div>
+          DiviCraft
+        </a>
+      </div>
+      <p class="footer-text">Clean, modular, performant layout structures for high-fidelity web applications. All divider SVGs are self-contained and scale dynamically.</p>
+      <p class="copyright">© 2026 DiviCraft. Inspired by Zenplates. Created in AntiGravity Planning Mode.</p>
+    </div>
+  </footer>
+
+  <!-- Toast Toast Notification -->
+  <div class="toast" id="toast">Code copied to clipboard successfully!</div>
+
+  <!-- Playground Scripts -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      // Elements
+      const shapeSelect = document.getElementById("shape-select");
+      const heightSlider = document.getElementById("height-slider");
+      const heightValue = document.getElementById("height-value");
+      const previewTop = document.getElementById("preview-top");
+      const previewBottom = document.getElementById("preview-bottom");
+      const previewDivider = document.getElementById("preview-divider");
+      const codeOutput = document.getElementById("code-output");
+      const copyBtn = document.getElementById("copy-code-btn");
+      const toast = document.getElementById("toast");
+      
+      const flipXBtn = document.getElementById("toggle-flip-x");
+      const flipYBtn = document.getElementById("toggle-flip-y");
+      const topDividerBtn = document.getElementById("toggle-top-divider");
+      const curvesOpaqueBtn = document.getElementById("toggle-curves-opaque");
+      const presetBtns = document.querySelectorAll(".preset-btn");
+
+      // State
+      let selectedShapeKey = "shape-book";
+      let height = 80;
+      let topBgStart = "#eef2ff";
+      let topBgEnd = "#e0e7ff";
+      let bottomBg = "#ffffff";
+      
+      let flipX = false;
+      let flipY = false;
+      let positionTop = false;
+      let curvesOpaque = false;
+
+      // Populate Select
+      if (window.SHAPES) {
+        Object.keys(window.SHAPES).forEach(key => {
+          const opt = document.createElement("option");
+          opt.value = key;
+          opt.textContent = window.SHAPES[key].name;
+          shapeSelect.appendChild(opt);
+        });
+        // Select book initially
+        shapeSelect.value = "shape-book";
+      }
+
+      // Initialize UI
+      updateUI();
+
+      // Event Listeners
+      shapeSelect.addEventListener("change", (e) => {
+        selectedShapeKey = e.target.value;
+        updateUI();
+      });
+
+      heightSlider.addEventListener("input", (e) => {
+        height = e.target.value;
+        heightValue.textContent = `${height}px`;
+        updateUI();
+      });
+
+      // Flips & Options
+      flipXBtn.addEventListener("click", () => {
+        flipX = !flipX;
+        flipXBtn.classList.toggle("active", flipX);
+        updateUI();
+      });
+
+      flipYBtn.addEventListener("click", () => {
+        flipY = !flipY;
+        flipYBtn.classList.toggle("active", flipY);
+        updateUI();
+      });
+
+      topDividerBtn.addEventListener("click", () => {
+        positionTop = !positionTop;
+        topDividerBtn.classList.toggle("active", positionTop);
+        
+        // Adjust classes for top vs bottom position
+        if (positionTop) {
+          previewDivider.classList.remove("bottom");
+          previewDivider.classList.add("top");
+        } else {
+          previewDivider.classList.remove("top");
+          previewDivider.classList.add("bottom");
+        }
+        updateUI();
+      });
+
+      curvesOpaqueBtn.addEventListener("click", () => {
+        curvesOpaque = !curvesOpaque;
+        curvesOpaqueBtn.classList.toggle("active", curvesOpaque);
+        updateUI();
+      });
+
+      // Color Presets
+      presetBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+          presetBtns.forEach(b => b.classList.remove("active"));
+          btn.classList.add("active");
+          
+          topBgStart = btn.dataset.topStart;
+          topBgEnd = btn.dataset.topEnd;
+          bottomBg = btn.dataset.bottom;
+          
+          updateColors();
+          updateUI();
+        });
+      });
+
+      // Update color variables.
+      // The gradient must run vertically (180deg): a diagonal gradient leaves the
+      // section's bottom edge a different color at every x, so the flat divider
+      // fill below can only ever match it at one point.
+      function updateColors() {
+        previewTop.style.background = `linear-gradient(180deg, ${topBgStart}, ${topBgEnd})`;
+        previewBottom.style.background = bottomBg;
+      }
+
+      // Copy Code Action
+      copyBtn.addEventListener("click", () => {
+        const text = codeOutput.textContent;
+        navigator.clipboard.writeText(text).then(() => {
+          // Success Feedback
+          toast.classList.add("show");
+          setTimeout(() => {
+            toast.classList.remove("show");
+          }, 3000);
+        }).catch(err => {
+          console.error("Clipboard copy failed: ", err);
+        });
+      });
+
+      // Render Loop
+      function updateUI() {
+        if (!window.SHAPES || !window.SHAPES[selectedShapeKey]) return;
+
+        const shape = window.SHAPES[selectedShapeKey];
+        
+        // Determine transforms
+        let transformStr = "";
+        if (flipY) transformStr += " scaleY(-1)";
+        if (flipX) transformStr += " scaleX(-1)";
+        transformStr = transformStr.trim();
+
+        // Layer fill colors & opacity
+        let bodyHtml = shape.body;
+        
+        // If curvesOpaque is true, remove translucency (fill-opacity/opacity attributes)
+        if (curvesOpaque) {
+          bodyHtml = bodyHtml.replace(/fill-opacity="[^"]*"/g, "");
+          bodyHtml = bodyHtml.replace(/opacity="[^"]*"/g, "");
+        }
+
+        // The SVG fill color is determined by which section it points to
+        // If positioned at bottom and not inverted: fills the bottom section color.
+        // Let's set a CSS variable or attribute fill.
+        // We'll replace default colors/fills in the path with currentColor or specific color.
+        // To do this simply, we will set the svg style color to bottomBg or topBg depending on layout.
+        const fillTargetColor = positionTop ? topBgEnd : bottomBg;
+
+        // Assemble SVG element
+        const transformStyle = transformStr ? ` style="transform: ${transformStr};"` : "";
+        const svgHtml = `
+          <svg viewBox="${shape.viewBox}" preserveAspectRatio="none" style="height: ${height}px; width: 100%; fill: ${fillTargetColor};">
+            <g${transformStyle}>
+              ${bodyHtml}
+            </g>
+          </svg>
+        `;
+
+        previewDivider.innerHTML = svgHtml;
+
+        // Generate Code Snippet
+        let snippet = `<!-- Section Divider Container -->
+<div style="position: relative; background: linear-gradient(180deg, ${topBgStart}, ${topBgEnd}); padding: 80px 24px;">
+  <!-- Section Content Goes Here -->
+  <div style="text-align: center;">
+    <h2>Section Alpha Content</h2>
+  </div>
+
+  <!-- Divider SVG (-1px overlaps the seam so no hairline gap shows) -->
+  <div style="position: absolute; ${positionTop ? 'top' : 'bottom'}: -1px; left: 0; width: 100%; line-height: 0; pointer-events: none;">
+    <svg viewBox="${shape.viewBox}" preserveAspectRatio="none" style="position: relative; display: block; width: 100%; height: ${height}px; fill: ${fillTargetColor};">
+      <g${transformStr ? ` style="transform: ${transformStr};"` : ""}>
+        ${bodyHtml.trim()}
+      </g>
+    </svg>
+  </div>
+</div>
+
+<div style="background-color: ${bottomBg}; padding: 80px 24px; color: #475569;">
+  <!-- Next Section Content Goes Here -->
+  <div style="text-align: center;">
+    <h2>Section Beta Content</h2>
+  </div>
+</div>`;
+
+        codeOutput.textContent = snippet;
+      }
+    });
+  </script>
+</body>
+</html>
