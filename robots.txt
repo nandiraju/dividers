@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nandiraju.github.io/dividers/sitemap.xml
